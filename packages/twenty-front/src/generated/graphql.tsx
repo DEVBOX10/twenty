@@ -1,5 +1,5 @@
-import * as Apollo from '@apollo/client';
 import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -153,6 +153,13 @@ export type ClientConfig = {
   signInPrefilled: Scalars['Boolean'];
   signUpDisabled: Scalars['Boolean'];
   support: Support;
+};
+
+export type ComputeServerlessFunctionInputSchemaInput = {
+  /** Serverless function ID */
+  serverlessFunctionId: Scalars['ID'];
+  /** Serverless function version */
+  serverlessFunctionVersion: Scalars['String'];
 };
 
 export type ComputeStepOutputSchemaInput = {
@@ -429,6 +436,7 @@ export type Mutation = {
   authorizeApp: AuthorizeApp;
   challenge: LoginToken;
   checkoutSession: SessionEntity;
+  computeServerlessFunctionInputSchema: Scalars['JSON'];
   computeStepOutputSchema: Scalars['JSON'];
   createOIDCIdentityProvider: SetupSsoOutput;
   createOneAppToken: AppToken;
@@ -512,6 +520,11 @@ export type MutationChallengeArgs = {
 export type MutationCheckoutSessionArgs = {
   recurringInterval: SubscriptionInterval;
   successUrlPath?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationComputeServerlessFunctionInputSchemaArgs = {
+  input: ComputeServerlessFunctionInputSchemaInput;
 };
 
 
@@ -1834,6 +1847,13 @@ export type ActivateWorkflowVersionMutationVariables = Exact<{
 
 
 export type ActivateWorkflowVersionMutation = { __typename?: 'Mutation', activateWorkflowVersion: boolean };
+
+export type ComputeServerlessFunctionInputSchemaMutationVariables = Exact<{
+  input: ComputeServerlessFunctionInputSchemaInput;
+}>;
+
+
+export type ComputeServerlessFunctionInputSchemaMutation = { __typename?: 'Mutation', computeServerlessFunctionInputSchema: any };
 
 export type ComputeStepOutputSchemaMutationVariables = Exact<{
   input: ComputeStepOutputSchemaInput;
@@ -3463,6 +3483,37 @@ export function useActivateWorkflowVersionMutation(baseOptions?: Apollo.Mutation
 export type ActivateWorkflowVersionMutationHookResult = ReturnType<typeof useActivateWorkflowVersionMutation>;
 export type ActivateWorkflowVersionMutationResult = Apollo.MutationResult<ActivateWorkflowVersionMutation>;
 export type ActivateWorkflowVersionMutationOptions = Apollo.BaseMutationOptions<ActivateWorkflowVersionMutation, ActivateWorkflowVersionMutationVariables>;
+export const ComputeServerlessFunctionInputSchemaDocument = gql`
+    mutation ComputeServerlessFunctionInputSchema($input: ComputeServerlessFunctionInputSchemaInput!) {
+  computeServerlessFunctionInputSchema(input: $input)
+}
+    `;
+export type ComputeServerlessFunctionInputSchemaMutationFn = Apollo.MutationFunction<ComputeServerlessFunctionInputSchemaMutation, ComputeServerlessFunctionInputSchemaMutationVariables>;
+
+/**
+ * __useComputeServerlessFunctionInputSchemaMutation__
+ *
+ * To run a mutation, you first call `useComputeServerlessFunctionInputSchemaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useComputeServerlessFunctionInputSchemaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [computeServerlessFunctionInputSchemaMutation, { data, loading, error }] = useComputeServerlessFunctionInputSchemaMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useComputeServerlessFunctionInputSchemaMutation(baseOptions?: Apollo.MutationHookOptions<ComputeServerlessFunctionInputSchemaMutation, ComputeServerlessFunctionInputSchemaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ComputeServerlessFunctionInputSchemaMutation, ComputeServerlessFunctionInputSchemaMutationVariables>(ComputeServerlessFunctionInputSchemaDocument, options);
+      }
+export type ComputeServerlessFunctionInputSchemaMutationHookResult = ReturnType<typeof useComputeServerlessFunctionInputSchemaMutation>;
+export type ComputeServerlessFunctionInputSchemaMutationResult = Apollo.MutationResult<ComputeServerlessFunctionInputSchemaMutation>;
+export type ComputeServerlessFunctionInputSchemaMutationOptions = Apollo.BaseMutationOptions<ComputeServerlessFunctionInputSchemaMutation, ComputeServerlessFunctionInputSchemaMutationVariables>;
 export const ComputeStepOutputSchemaDocument = gql`
     mutation ComputeStepOutputSchema($input: ComputeStepOutputSchemaInput!) {
   computeStepOutputSchema(input: $input)

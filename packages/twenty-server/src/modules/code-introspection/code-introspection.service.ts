@@ -8,11 +8,11 @@ import {
   SyntaxKind,
 } from 'ts-morph';
 
+import { generateFakeValue } from 'src/engine/utils/generate-fake-value';
 import {
   CodeIntrospectionException,
   CodeIntrospectionExceptionCode,
 } from 'src/modules/code-introspection/code-introspection.exception';
-import { generateFakeValue } from 'src/engine/utils/generate-fake-value';
 
 type FunctionParameter = {
   name: string;
@@ -27,7 +27,23 @@ export class CodeIntrospectionService {
     this.project = new Project();
   }
 
-  public analyze(
+  public generateInputData(fileContent: string, fileName = 'temp.ts') {
+    const parameters = this.getParameters(fileContent, fileName);
+
+    return this.generateFakeDataFromParams(parameters);
+  }
+
+  public getFunctionInputSchema(sourceCode: string): Record<string, string> {
+    const parameters = this.getParameters(sourceCode);
+
+    return parameters.reduce((acc, param) => {
+      acc[param.name] = param.type;
+
+      return acc;
+    }, {});
+  }
+
+  private getParameters(
     fileContent: string,
     fileName = 'temp.ts',
   ): FunctionParameter[] {
@@ -38,7 +54,7 @@ export class CodeIntrospectionService {
     const functionDeclarations = sourceFile.getFunctions();
 
     if (functionDeclarations.length > 0) {
-      return this.analyzeFunctions(functionDeclarations);
+      return this.getFunctionParameters(functionDeclarations);
     }
 
     const arrowFunctions = sourceFile.getDescendantsOfKind(
@@ -46,13 +62,13 @@ export class CodeIntrospectionService {
     );
 
     if (arrowFunctions.length > 0) {
-      return this.analyzeArrowFunctions(arrowFunctions);
+      return this.getArrowFunctionParameters(arrowFunctions);
     }
 
     return [];
   }
 
-  private analyzeFunctions(
+  private getFunctionParameters(
     functionDeclarations: FunctionDeclaration[],
   ): FunctionParameter[] {
     if (functionDeclarations.length > 1) {
@@ -67,7 +83,7 @@ export class CodeIntrospectionService {
     return functionDeclaration.getParameters().map(this.buildFunctionParameter);
   }
 
-  private analyzeArrowFunctions(
+  private getArrowFunctionParameters(
     arrowFunctions: ArrowFunction[],
   ): FunctionParameter[] {
     if (arrowFunctions.length > 1) {
@@ -91,23 +107,13 @@ export class CodeIntrospectionService {
     };
   }
 
-  public generateInputData(fileContent: string, fileName = 'temp.ts') {
-    const parameters = this.analyze(fileContent, fileName);
-
-    return this.generateFakeDataFromParams(parameters);
-  }
-
   private generateFakeDataFromParams(
     params: FunctionParameter[],
   ): Record<string, any> {
-    const data: Record<string, any> = {};
+    return params.reduce((acc, param) => {
+      acc[param.name] = generateFakeValue(param.type);
 
-    params.forEach((param) => {
-      const type = param.type;
-
-      data[param.name] = generateFakeValue(type);
-    });
-
-    return data;
+      return acc;
+    }, {});
   }
 }

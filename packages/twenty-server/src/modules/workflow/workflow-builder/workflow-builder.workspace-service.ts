@@ -23,13 +23,41 @@ import {
 import { isDefined } from 'src/utils/is-defined';
 
 @Injectable()
-export class WorkflowBuilderService {
+export class WorkflowBuilderWorkspaceService {
   constructor(
     private readonly serverlessFunctionService: ServerlessFunctionService,
     private readonly codeIntrospectionService: CodeIntrospectionService,
     @InjectRepository(ObjectMetadataEntity, 'metadata')
     private readonly objectMetadataRepository: Repository<ObjectMetadataEntity>,
   ) {}
+
+  async computeServerlessFunctionInputSchema({
+    serverlessFunctionId,
+    serverlessFunctionVersion,
+    workspaceId,
+  }: {
+    serverlessFunctionId: string;
+    serverlessFunctionVersion: string;
+    workspaceId: string;
+  }): Promise<object> {
+    if (serverlessFunctionId === '') {
+      return {};
+    }
+
+    const sourceCode = (
+      await this.serverlessFunctionService.getServerlessFunctionSourceCode(
+        workspaceId,
+        serverlessFunctionId,
+        serverlessFunctionVersion,
+      )
+    )?.[join('src', INDEX_FILE_NAME)];
+
+    if (!isDefined(sourceCode)) {
+      return {};
+    }
+
+    return this.codeIntrospectionService.getFunctionInputSchema(sourceCode);
+  }
 
   async computeStepOutputSchema({
     step,
